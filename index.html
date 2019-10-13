@@ -130,7 +130,7 @@
             			roomDiv.attr('data-pad', room.slug);
             			$('#list').append(roomDiv);
             			var isSelfHosted = room.is_self_hosted == undefined || room.is_self_hosted == null || room.is_self_hosted == 1;
-            			roomDiv.find('a').attr('href', isSelfHosted ? 'https://sh.musiqpadmqp.github.io/p/' + room.slug : '/p/' + room.slug);
+            			roomDiv.find('a').attr('href', isSelfHosted ? room.pad_url : '/p/' + room.slug);
             			roomDiv.find('.pad-name').text(room.pad_name ? room.pad_name : room.slug + ' (Pending Initial Update)');
             			roomDiv.find('.pad-owner').text( (!room.pad_owner) ? (!room.api_pad_owner) ? 'Waiting for Owner' : 'Owner: ' + room.api_pad_owner : 'Owner: '+ room.pad_owner );
             			roomDiv.find('.pad-dj').text('Nobody is playing');
