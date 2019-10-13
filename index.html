@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.5">
+<meta name="theme-color" content="1C1C1F">
+<title>musiqpad | Lounge</title>
+<meta name="description" content="Real time music streaming and chat with friends. Musiqpad is a place where people can discover new music.">
+<meta name="keywords" content="discover, new, music, song, sound, youtube, stream, chat, friends, share, listen, woot, meh, plug, dj, dubtrack, fm, turntable">
+<link rel="shortcut icon" type="image/png" href="https://musiqpadmqp.github.io/pads/lib/img/icon.png"/>
+<link href="pads/lib/css/mdi.min.css" media="all" rel="stylesheet" type="text/css"/>
+<script src="jquery-1.11.3.min.js"></script>
+<script type="text/javascript">(function(e,t){var n=e.amplitude||{};var r=t.createElement("script");r.type="text/javascript";r.async=true;r.src="libs/amplitude-2.9.0-min.gz.js";r.onload=function(){e.amplitude.runQueuedFunctions()};var s=t.getElementsByTagName("script")[0];s.parentNode.insertBefore(r,s);var i=function(){this._q=[];return this};function a(e){i.prototype[e]=function(){this._q.push([e].concat(Array.prototype.slice.call(arguments,0)));return this}}var o=["add","append","clearAll","set","setOnce","unset"];for(var c=0;c<o.length;c++){a(o[c])}n.Identify=i;n._q=[];function u(e){n[e]=function(){n._q.push([e].concat(Array.prototype.slice.call(arguments,0)));}}var l=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties"];for(var p=0;p<l.length;p++){u(l[p])}e.amplitude=n})(window,document);amplitude.init("2d3eb4a42289c22e4a7a3f7ea45718a9");amplitude.logEvent("LOUNGE_LOADED")</script>
+<link rel="stylesheet" type="text/css" href="lounge/css/lobby.css">
+<base target="_parent"/>
+</head>
+<body>
+<div id="background"></div>
+<section id="scroll">
+<section id="header">
+<div class="header-container">
+<div class="header-content">
+<a href="/" title="Copyright (c) 2015-2019 Musiqpad Team"><img src="pads/lib/img/mqp.png" class="avatar" alt="musiqpad"></a>
+</div>
+</div>
+</section>
+<section>
+<div class="header-content extra-info">Can't see your pad in the list? <a href="javascript:makeTroubleshootingModal()">Click here for some troubleshooting tips!</a></div>
+</section>
+<section id="search">
+<input type="text" id="searchbox" placeholder="Search for pads...">
+</section>
+<section id="list">
+<div class="pad template" style="">
+<a href="">
+<div class="pad-img">
+<nav>
+<span class="song-title"></span>
+<div>
+<span class="mdi mdi-account-multiple user-logo"></span>
+<span class="users"></span>
+</div>
+</nav>
+</div>
+<div class="pad-info">
+<p class="pad-name">Looking for pads...</p>
+<p class="pad-owner"></p>
+<p class="pad-dj"></p>
+</div>
+</a>
+</div>
+</section>
+</section>
+<section id="footer">
+<div class="left">
+<div class="ad"></div>
+</div>
+<div class="right">
+<a target="_blank" href="/" title="API Documentation" class="btn">
+<div class="mdi mdi-file-document"></div>
+</a>
+<a target="_blank" href="https://www.facebook.com/musiqpad" class="btn">
+<div class="mdi mdi-facebook"></div>
+</a>
+<a target="_blank" href="https://twitter.com/musiqpad" class="btn">
+<div class="mdi mdi-twitter"></div>
+</a>
+<a target="_blank" href="https://www.reddit.com/r/musiqpad/" class="btn">
+<div class="mdi mdi-reddit"></div>
+</a>
+<a target="_blank" href="blog_subdomain/index/" class="btn">
+<div class="mdi mdi-tumblr"></div>
+</a>
+<a target="_blank" href="https://www.youtube.com/watch?list=PL-1JbEJbwVuXWpp8RWdQGOwJb7Y8BrGdS&amp;v=BjLBB-TMa84" class="btn">
+<div class="mdi mdi-youtube-play"></div>
+</a>
+</div>
+</section>
+<div class="cover"></div>
+<script>
+            var pads = {};
+            var announcement = "";
+            function updateRooms() {
+            	$.getJSON('lounge/announce.js', function(data) {
+            		if (data.announcement) {
+            			announcement = data.announcement;
+            			$('.ad').html('<div class="mdi mdi-bullhorn" style="padding-right:10px"></div>' + data.announcement);
+            			$('.ad').attr('title', data.announcement);
+            			$('.ad').click(makeAnnounceModal);
+            		}
+            		if (data.allowApiKeyGeneration) {
+            			$('.btn-key').show();
+            		}
+            		else {
+            			$('.btn-key').hide();
+            		}
+            		if (data.version) {
+            			$('.welcome').html('<i>Welcome to musiqpad ' + data.version + '. Please read our <a target="_blank" href="blog_subdomain/faq/">FAQ</a></i>');
+            		}
+            	});
+            	$.getJSON("https://apimqp.glitch.io/pad/list", function(data) {
+            		var template = $('.pad.template');
+            		template.show();
+            		$('.pad:not(.template)').remove();
+            		//data.sort(function(a, b){return (b.user_count?b.user_count:0)-(a.user_count?a.user_count:0)});
+            		data.sort(function(a, b) {
+            			var b_uc = (b.user_count?b.user_count:0);
+            			var a_uc = (a.user_count?a.user_count:0);
+            			if (b_uc != a_uc) {
+            				return b_uc - a_uc;
+            			} else if (b.is_self_hosted != a.is_self_hosted) {
+            				return (b.is_self_hosted * -1) - (a.is_self_hosted * -1)
+            			} else { 
+            				return (b.current_song + "").length - (a.current_song + "").length;
+            			}
+            		});
+            		for (var i = 0, len = data.length; i < len; i++) {
+            			var room = data[i];
+            			if (room.slug) {
+            				pads[room.slug] = room;
+            			}
+            			if ((!room.pad_url || room.pad_url == '') && (!room.socket_host || room.socket_host == '')) {
+            				continue;
+            			}
+            			var roomDiv = template.clone();
+            			roomDiv.removeClass('template');
+            			var roomClass = 'pad-' + room.slug;
+            			roomDiv.addClass(roomClass);
+            			roomDiv.attr('data-pad', room.slug);
+            			$('#list').append(roomDiv);
+            			var isSelfHosted = room.is_self_hosted == undefined || room.is_self_hosted == null || room.is_self_hosted == 1;
+            			roomDiv.find('a').attr('href', isSelfHosted ? 'https://sh.musiqpadmqp.github.io/p/' + room.slug : '/p/' + room.slug);
+            			roomDiv.find('.pad-name').text(room.pad_name ? room.pad_name : room.slug + ' (Pending Initial Update)');
+            			roomDiv.find('.pad-owner').text( (!room.pad_owner) ? (!room.api_pad_owner) ? 'Waiting for Owner' : 'Owner: ' + room.api_pad_owner : 'Owner: '+ room.pad_owner );
+            			roomDiv.find('.pad-dj').text('Nobody is playing');
+            			roomDiv.find('.users').text(room.user_count ? room.user_count : '0');
+            			roomDiv.find('.pad-dj').text(!room.current_dj_name ? '' : 'DJ: ' + room.current_dj_name);
+            			roomDiv.find('.song-title').html(!isSelfHosted ? '<img class="mp-official" src="/pads/lib/img/icon.png"></img>MP Official' : '');
+            			if (room.current_song) {
+            				//$.get('https://youtube.com/get_video_info?video_id=W2H_E_BHdh8', function( data ) {
+            				//	roomDiv.find('.song-title').text(data.title);
+            				//});
+            				//roomDiv.find('.song-title').text(room.currentSong.title);
+            				roomDiv.find('.pad-img').css({
+            					'background-image': 'url(https://i.ytimg.com/vi/' + room.current_song + '/mqdefault.jpg)',
+            					'background-size': '100% 100%'
+            				});
+            			} else {
+            				roomDiv.find('.pad-img').css({
+            					'background-image': 'url(pads/lib/img/avatar.png)',
+            					'background-position': 'center'
+            				});
+            			}
+            		}
+                             filterPads();
+            		template.hide();
+            	});
+            }
+            updateRooms();
+            setInterval(updateRooms, 60 * 1000);
+            function getRoomFromClassList(jqueryElement) {
+            	if (jqueryElement != null && jqueryElement.length != 0) {
+            		return $(jqueryElement[0]).attr('data-pad');
+            	}
+            	return null;
+            }
+            function hasQueryParam(field) {
+            	var url = window.location.href;
+            	if(url.indexOf('?' + field) != -1)
+             				return true;
+            	else if(url.indexOf('&' + field) != -1)
+             				return true;
+            	return false
+            }
+            if (hasQueryParam('embed')) {
+            	$('body').addClass('embed');
+            }
+            function registerApiKey() {
+            	var token = getCookie('token');
+            	var slug = $('.api_slug')[0].value;
+            	var padUrl = $('.api_pad_url')[0].value;
+            	var serverHost = $('.api_server_host')[0].value;
+            	if ((!slug || slug == '') && (!serverHost || serverHost == '')) {
+            		$('.modal-bg').remove();
+            		return;
+            	}
+            	if (!token) {
+            		alert("Please ensure that you have logged into/created an account in the 'Welcome to musiqpad!' pad before attempting to generate an api key.");
+            		return;
+            	}
+            	if (!(/(?:[A-Za-z0-9-]+\.)+[A-Za-z0-9]{1,3}:\d{1,5}/.test(serverHost))) {
+            		alert('Your server host does not appear to be using the correct format.');
+            		return;
+            	}
+            	if (!(/^[a-z0-9_-]{1,32}$/.test(slug.toLowerCase()))) {
+            		alert('Your slug can only contain alphanumeric characters, underscores and dashes.');
+            		return;
+            	}
+            	$.get('https://api.musiqpadmqp.github.io/auth/genkey?token=' + token + '&server_host=' + serverHost + '&slug=' + slug + (padUrl == null || padUrl == '' ? '' : '&pad_url=' + padUrl), function(data) {
+            		console.log(data);
+            		if (data.apiKey) {
+            			amplitude.logEvent('CREATED_API_KEY', { slug: slug, padUrl: padUrl, socketHost: serverHost });
+            			$('.modal-bg').remove();
+            			$('body').append('\
+            				<div class="modal-bg">\
+            					<div class="modal-container">\
+            						<div class="modal">\
+            							<div class="modal-box">\
+            								<div class="modal-text">\
+            									<h3>Your API Key for "' + slug + '"</h3>\
+            									<input type="text" class="modal-input" readonly onClick="this.select();" value="' + data.apiKey + '" /><br><br>\
+            									Make sure to keep this safe as you will not be able to recover it!\
+            								</div>\
+            							</div>\
+            							<div class="modal-controls">\
+            								<div class="modal-ctrl">\
+            									<div class="modal-no" onclick="$(\'.modal-bg\').remove()">\
+            										<div class="mdi mdi-close"></div>\
+            									</div>\
+            									<div class="modal-yes" onclick="$(\'.modal-bg\').remove()">\
+            										<div class="mdi mdi-check"></div>\
+            									</div>\
+            								</div>\
+            							</div>\
+            						</div>\
+            					</div>\
+            				</div>\
+            			');
+            			$('body').on('click', '.modal-yes', function() {
+            				$('.modal-bg').remove();
+            			});
+            		}
+            		else {
+            			alert('Failed to generate API Key. If you keep seeing this message please contact: support@musiqpadmqp.github.io');
+            		}
+            	}).error(function(data) {
+            		if (data.status == 403) {
+            			alert("Please ensure that you have logged into/created an account in the 'Welcome to musiqpad!' pad before attempting to generate an api key.");
+            		}
+            		else if (data.status == 409) {
+            			alert("The slug you are attempting to create is already in use. If you would like to update the information connected to this slug please contact: support@musiqpadmqp.github.io");
+            		}
+            		else if (data.status == 400){
+            			alert("Invalid paramters.");
+            		}
+            		//$('.modal-bg').remove();
+            	});
+            }
+            function getCookie(name) {
+            	var value = "; " + document.cookie;
+            	var parts = value.split("; " + name + "=");
+            			if (parts.length == 2) return parts.pop().split(";").shift();
+            }
+            function makeModal() {
+            	$('body').append('\
+            		<div class="modal-bg">\
+            			<div class="modal-container">\
+            				<div class="modal">\
+            					<div class="modal-box">\
+            						<div class="modal-text">\
+            							<h3>Register for an API Key</h3>\
+            							<input type="text" class="modal-input api_slug" placeholder="Room Slug" />\
+            							<input type="text" class="modal-input api_server_host" placeholder="Socket Host & Port (Format: domain:port)" />\
+            							<input type="text" class="modal-input api_pad_url" placeholder="Pad URL (Not required)" /><br><br>\
+            							<ul>\
+            								<li>Only sockets supporting SSL will work on the musiqpad frontend. If your socket does NOT support SSL then you will have to host your own frontend.</li>\
+            								<li>Pad URL is only used for Self Hosted pads that have their own frontend page.</li>\
+            								<li>If you want your pad to be hosted on musiqpad\'s frontend leave this blank.</li>\
+            							</ul>\
+            						</div>\
+            					</div>\
+            					<div class="modal-controls">\
+            						<div class="modal-ctrl">\
+            							<div class="modal-no" onclick="$(\'.modal-bg\').remove()">\
+            								<div class="mdi mdi-close"></div>\
+            							</div>\
+            							<div class="modal-yes" onclick="registerApiKey()">\
+            								<div class="mdi mdi-check"></div>\
+            							</div>\
+            						</div>\
+            					</div>\
+            				</div>\
+            			</div>\
+            		</div>\
+            	');
+            }
+            $('.btn-key').on('click', function(){
+            	makeModal();
+            });
+                     $('#searchbox').on("change keyup paste", function(){
+                         filterPads();
+                     });
+                     function filterPads(){
+                         var val = $('#searchbox').val().toLowerCase();
+                         for(var slug in pads){
+                             if(!/^[a-z\.,_-]+$/.test(slug)) continue;
+                             var pad = pads[slug];
+                             if(slug.indexOf(val) == -1 && (pad.pad_name || "").toLowerCase().indexOf(val) == -1 && (pad.pad_owner || pad.api_pad_owner || "").toLowerCase().indexOf(val) == -1)
+                                 $('.pad-' + slug).hide();
+                             else
+                                 $('.pad-' + slug).show();
+                         }
+                     }
+            function makeAlertModal(data) {
+                                         $('body').append('\
+                                                 <div class="modal-bg">\
+                                                         <div class="modal-container">\
+                                                                 <div class="modal large">\
+                                                                         <div class="modal-box">\
+                                                                                 <div class="modal-text">' +
+            							data + '\
+                                                                                 </div>\
+                                                                         </div>\
+                                                                         <div class="modal-controls">\
+                                                                                 <div class="modal-ctrl">\
+                                                                                         <div class="modal-yes" onclick="$(\'.modal-bg\').remove()" style="width:100%;">\
+                                                                                                 <div class="mdi mdi-check"></div>\
+                                                                                         </div>\
+                                                                                 </div>\
+                                                                         </div>\
+                                                                 </div>\
+                                                         </div>\
+                                                 </div>\
+                                         ');
+                                 }
+            function makeTroubleshootingModal() {
+            makeAlertModal('\
+            <h3>Can\'t see your pad in the list?</h3>\
+                   <p>The most common reason for pads to not be shown is that they are either offline or not sending lobby updates.<br/>Below are some common troubleshooting issues.</p>\
+                  	<ul>\
+                  		<li>Pads will only be shown when they have sent an update in the last <b>30 minutes</b>.</li>\
+                         		<li>New Pads have a grace period of <b>2 hours</b> in which they need to send an update.</li>\
+                 		        <li>If you pad misses the update period it will be shown again once it next updates</li>\
+            </ul>\
+            ');
+            }
+            function makeAnnounceModal() {
+            makeAlertModal('\
+            <h3>Announcement</h3>' + announcement
+            );
+            }
+        </script>
+</body>
+</html>

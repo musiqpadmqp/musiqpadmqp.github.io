@@ -1,0 +1,1 @@
+{"announcement":"We changed the algorithm for how pads are displayed in the lounge! Make sure to read the troubleshooting if you are having issues!","allowApiKeyGeneration":true,"version":"0.7.0 Beta"}
