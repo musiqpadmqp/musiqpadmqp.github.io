@@ -279,8 +279,9 @@
                              if(!/^[a-z\.,_-]+$/.test(slug)) continue;
                              var pad = pads[slug];
                              if(slug.indexOf(val) == -1 && (pad.pad_name || "").toLowerCase().indexOf(val) == -1 && (pad.pad_owner || pad.api_pad_owner || "").toLowerCase().indexOf(val) == -1)
-                             else
+                             {} else {
                                  $('.pad-' + slug).show();
+                             }
                          }
                      }
             function makeAlertModal(data) {
