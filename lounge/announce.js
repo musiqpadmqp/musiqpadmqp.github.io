@@ -1,1 +1,1 @@
-{"announcement":"We changed the algorithm for how pads are displayed in the lounge! Make sure to read the troubleshooting if you are having issues!","allowApiKeyGeneration":true,"version":"0.7.0 Beta"}
+{"announcement":"If you dont see your pad on the list please enable sendlobby stats in your config file.","allowApiKeyGeneration":true,"version":"0.8.5"}
