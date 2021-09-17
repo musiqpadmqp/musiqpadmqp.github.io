@@ -21,12 +21,12 @@
 <section id="header">
 <div class="header-container">
 <div class="header-content">
-<a href="/" title="Copyright (c) 2015-2019 Musiqpad Team"><img src="pads/lib/img/mqp.png" class="avatar" alt="musiqpad"></a>
+<a href="/" title="Copyright (c) 2015-2021 Musiqpad Team"><img src="pads/lib/img/mqp.png" class="avatar" alt="musiqpad"></a>
 </div>
 </div>
 </section>
 <section>
-<div class="header-content extra-info">Can't see your pad in the list? Enable send lobby stats<br>Join to our <a href="https://musiqpadmqp.github.io/discord">Discord</a></div>
+<div class="header-content extra-info">You can see here all online pads. Join in your favourite and listen together music.<br></div>
 </section>
 <section id="search">
 <input type="text" id="searchbox" placeholder="Search for pads...">
@@ -279,7 +279,6 @@
                              if(!/^[a-z\.,_-]+$/.test(slug)) continue;
                              var pad = pads[slug];
                              if(slug.indexOf(val) == -1 && (pad.pad_name || "").toLowerCase().indexOf(val) == -1 && (pad.pad_owner || pad.api_pad_owner || "").toLowerCase().indexOf(val) == -1)
-                                 $('.pad-' + slug).hide();
                              else
                                  $('.pad-' + slug).show();
                          }
