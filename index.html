@@ -81,11 +81,7 @@
             			$('.welcome').html('<i>Welcome to musiqpad ' + data.version + '. Please read our <a target="_blank" href="blog_subdomain/faq/">FAQ</a></i>');
             		}
             	});
-                        $.ajax({
-  method: 'GET',
-  url: 'https://mqpapi.glitch.me/pad/list',
-  dataType: 'jsonp', //change the datatype to 'jsonp' works in most cases
-  success: (data) => {
+            	$.getJSON("https://api.allorigins.win/raw?url=https://mqpapi.glitch.me/pad/list", function(data) {
             		var template = $('.pad.template');
             		template.show();
             		$('.pad:not(.template)').remove();
