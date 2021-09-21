@@ -64,7 +64,7 @@
             var pads = {};
             var announcement = "";
             function updateRooms() {
-            	$.getJSON('lounge/announce.js', function(data) {
+            	$.getJSON('https://mqpapi.glitch.me/announce', function(data) {
             		if (data.announcement) {
             			announcement = data.announcement;
             			$('.ad').html('<div class="mdi mdi-bullhorn" style="padding-right:10px"></div>' + data.announcement);
@@ -179,7 +179,7 @@
             		alert('Your slug can only contain alphanumeric characters, underscores and dashes.');
             		return;
             	}
-            	$.get('https://api.musiqpadmqp.github.io/auth/genkey?token=' + token + '&server_host=' + serverHost + '&slug=' + slug + (padUrl == null || padUrl == '' ? '' : '&pad_url=' + padUrl), function(data) {
+            	$.get('https://mqpapi.glitch.me/genkey?token=' + token + '&server_host=' + serverHost + '&slug=' + slug + (padUrl == null || padUrl == '' ? '' : '&pad_url=' + padUrl), function(data) {
             		console.log(data);
             		if (data.apiKey) {
             			amplitude.logEvent('CREATED_API_KEY', { slug: slug, padUrl: padUrl, socketHost: serverHost });
